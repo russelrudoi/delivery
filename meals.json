@@ -1,0 +1,86 @@
+[
+    {
+        "namePlace": "Mac Donny",
+        "foods": [
+            {
+                "name": "Big Big Burger",
+                "price": 23
+            },
+            {
+                "name": "Small Big Burger",
+                "price": 18
+            },
+            {
+                "name": "Small Small Burger",
+                "price": 12
+            },
+            {
+                "name": "Small Medium Burger",
+                "price": 15
+            }
+        ]
+    },
+    {
+        "namePlace": "CFK",
+        "foods": [
+            {
+                "name": "Big Big Burger",
+                "price": 23
+            },
+            {
+                "name": "Small Big Burger",
+                "price": 18
+            },
+            {
+                "name": "Small Small Burger",
+                "price": 12
+            },
+            {
+                "name": "Small Medium Burger",
+                "price": 15
+            }
+        ]
+    },
+    {
+        "namePlace": "Burger Queen",
+        "foods": [
+            {
+                "name": "Big Big Burger",
+                "price": 23
+            },
+            {
+                "name": "Small Big Burger",
+                "price": 18
+            },
+            {
+                "name": "Small Small Burger",
+                "price": 12
+            },
+            {
+                "name": "Small Medium Burger",
+                "price": 15
+            }
+        ]
+    },
+    {
+        "namePlace": "Sunbucks",
+        "foods": [
+            {
+                "name": "Big Big Burger",
+                "price": 23
+            },
+            {
+                "name": "Small Big Burger",
+                "price": 18
+            },
+            {
+                "name": "Small Small Burger",
+                "price": 12
+            },
+            {
+                "name": "Small Medium Burger",
+                "price": 15
+            }
+        ]
+    }
+]
