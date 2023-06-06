@@ -3,51 +3,91 @@ import {
     Card,
     CardContent,
     CardMedia,
-    Typography
+    Typography,
+    Grid,
+    Alert
 } from '@mui/material';
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
 
-import GoodsImg from '../../assets/img/burger.jpg';
+import { addGoodToCart } from '../../store/cart/cartSlice';
 
-const GoodItem = () => {
-    const request = () => {
-        axios
-            .get('http://localhost:5000/api/meal')
-            .then(function (response) {
-                // handle success
-                console.log(response.data);
-            })
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            });
+const GoodItem = ({ meal, widthItem }) => {
+    const dispatch = useDispatch();
+    const { cart } = useSelector(state => state.cartReducer);
+
+    const { _id, name, price, image } = meal;
+
+    const addToCart = () => {
+        dispatch(addGoodToCart(meal));
     };
-
-    useState(() => {
-        request();
-    }, []);
-
     return (
-        <Card>
-            <CardMedia
-                component='img'
-                alt='burger'
-                image='http://localhost:5000/static/burger.jpg'
-            />
-            <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography gutterBottom variant='subtitle1' component='div'>
-                    Big Big Burger
-                </Typography>
-                <Button
-                    variant='outlined'
-                    size='small'
-                    sx={{ justifySelf: 'flex-end' }}
-                >
-                    Add to cart
-                </Button>
-            </CardContent>
-        </Card>
+        <Grid item xs={widthItem}>
+            <Card>
+                <CardMedia
+                    component='img'
+                    alt={name}
+                    image={`http://localhost:5000/image/${image}`}
+                    sx={{ height: '170px' }}
+                />
+                <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography
+                        gutterBottom
+                        variant='subtitle1'
+                        component='div'
+                    >
+                        {name}
+                    </Typography>
+                    <Typography
+                        gutterBottom
+                        variant='subtitle2'
+                        component='div'
+                    >
+                        {price}$
+                    </Typography>
+                    {/* <Button
+                        color='inherit'
+                        variant='outlined'
+                        onClick={addToCart}
+                        size='small'
+                        sx={{ justifySelf: 'flex-end', color: 'white' }}
+                    >
+                        <Typography variant='subtitle2'>Add to cart</Typography>
+                    </Button> */}
+                    {cart.find(meal => meal._id === _id) ? (
+                        <Alert
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                bgcolor: 'background.paper',
+                                height: '30px',
+                                pb: 0
+                            }}
+                            severity='success'
+                        >
+                            <Typography variant='subtitle1' p={0}>
+                                In cart
+                            </Typography>
+                        </Alert>
+                    ) : (
+                        <Button
+                            color='inherit'
+                            variant='outlined'
+                            onClick={addToCart}
+                            size='small'
+                            sx={{
+                                justifySelf: 'flex-end',
+                                color: 'white',
+                                height: '30px'
+                            }}
+                        >
+                            <Typography variant='subtitle2'>
+                                Add to cart
+                            </Typography>
+                        </Button>
+                    )}
+                </CardContent>
+            </Card>
+        </Grid>
     );
 };
 

@@ -1,10 +1,40 @@
+.link {
+    button {
+        position: relative;
+        transition: color 0.15s ease;
+        cursor: pointer;
+
+        &::before {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            content: '';
+            display: block;
+            width: 0%;
+            height: 3px;
+            background: #c80000;
+            border-radius: 10px;
+            transition: all 0.3s ease-in-out;
+        }
+    }
+}
+
 .active {
     button {
-        color: #bcc0c4;
-        text-decoration: underline;
+        &::before {
+            width: 80%;
+        }
     }
 
     svg {
-        color: #bcc0c4;
+        transition: all 0.3s ease-in-out;
+        color: #c80000;
+    }
+}
+
+.icon {
+    svg {
+        transition: all 0.3s ease-in-out;
     }
 }

@@ -1,19 +1,24 @@
+import { ObjectId } from 'mongodb';
 import { User } from '../models/user.js';
 
 class UserController {
     async create(req, res) {
-        // const { name, phone } = req.body;
-        // const user = new User({ name, phone });
-        // user.save();
-        // return res.json(user);
         try {
-            const { name, phone } = req.body;
+            const { orderDate, name, phone, email, address, meals } =
+                await req.body;
 
-            const user = new User({ name: name, phone: phone });
+            const user = new User({
+                orderDate,
+                name,
+                phone,
+                email,
+                address,
+                meals
+            });
+
             user.save();
-            return res.json('create');
         } catch (error) {
-            console.log(error);
+            return res.status(500).send('Failed to create an order');
         }
     }
 

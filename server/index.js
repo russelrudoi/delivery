@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import 'dotenv/config';
 import cors from 'cors';
-import { Meal } from './models/meal.js';
 import { User } from './models/user.js';
 import router from './routes/index.js';
 
@@ -17,7 +16,10 @@ app.use('/image', express.static('static/image'));
 const start = async () => {
     try {
         mongoose
-            .connect(process.env.URL_DB, { useUnifiedTopology: true })
+            .connect(
+                'mongodb+srv://selezen:EGWSodzn03arU37R@cluster0.bcqudsg.mongodb.net/delivery',
+                { useUnifiedTopology: true }
+            )
             .then(res => {
                 console.log('connect to DB');
             })
@@ -29,7 +31,11 @@ const start = async () => {
     }
 };
 start();
-
+// AIzaSyC5LKx1GLgfC976S0RsCOtQwRg8DbGAf84 -- google api key
+// app.use((err, req, res, next) => {
+//     console.error('Произошла ошибка:', err);
+//     res.status(500).send('Internal Server Error');
+// });
 // const client = new MongoClient('mongodb://localhost:27017/', {
 //     useUnifiedTopology: true
 // });
