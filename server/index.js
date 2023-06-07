@@ -2,16 +2,21 @@ import express from 'express';
 import mongoose from 'mongoose';
 import 'dotenv/config';
 import cors from 'cors';
-import { User } from './models/user.js';
 import router from './routes/index.js';
+import path from 'path';
 
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const PORT = process.env.PORT || 5000;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api', router);
-app.use('/', express.static('public'));
+app.use(express.static(__dirname + '/public/'));
 
 const start = async () => {
     try {
