@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api', router);
-app.use('/image', express.static('static/image'));
+app.use('/', express.static('public'));
 
 const start = async () => {
     try {
