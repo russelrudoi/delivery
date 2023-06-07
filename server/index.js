@@ -31,22 +31,3 @@ const start = async () => {
     }
 };
 start();
-// AIzaSyC5LKx1GLgfC976S0RsCOtQwRg8DbGAf84 -- google api key
-// app.use((err, req, res, next) => {
-//     console.error('Произошла ошибка:', err);
-//     res.status(500).send('Internal Server Error');
-// });
-// const client = new MongoClient('mongodb://localhost:27017/', {
-//     useUnifiedTopology: true
-// });
-
-// async function run() {
-//     try {
-//         await client.connect();
-//         console.log('connect');
-//     } catch (e) {
-//         // Ensures that the client will close when you finish/error
-//         console.log(e);
-//     }
-// }
-// run();

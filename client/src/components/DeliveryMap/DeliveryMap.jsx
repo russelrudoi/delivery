@@ -1,5 +1,5 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     useJsApiLoader,
     GoogleMap,
@@ -7,23 +7,16 @@ import {
     Autocomplete,
     DirectionsRenderer
 } from '@react-google-maps/api';
-import { useFormContext } from 'react-hook-form';
 
 const libraries = ['places'];
 
-const DeliveryMap = () => {
+const DeliveryMap = ({ inputAddress, validateFields, isFocus }) => {
     const [directionsResponse, setDirectionsResponse] = useState(null);
     const [destinationAddress, setDestinationAddress] = useState(null);
     const [distance, setDistance] = useState(null);
     const [duration, setDuration] = useState(null);
-    const [address, setAddress] = useState('');
+    const [isAddress, setIsAddress] = useState(false);
     const [error, setError] = useState(null);
-
-    const {
-        register,
-        setValue,
-        formState: { errors, isValid }
-    } = useFormContext();
 
     const destinationRef = useRef();
 
@@ -31,22 +24,30 @@ const DeliveryMap = () => {
         googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         libraries: libraries
     });
+
+    useEffect(() => {
+        validateFields(isAddress, destinationAddress);
+    }, [isAddress, validateFields, destinationAddress]);
+
+    useEffect(() => {
+        if (!isFocus) calculateRoute();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isFocus]);
     // const google = window.google;
     const shopPosition = { lat: 50.44043182101505, lng: 30.510806900146395 };
 
     if (!isLoaded) {
         return <div>not loaded</div>;
     }
-
     const handleMapClick = event => {
         const { latLng } = event;
         const coordinate = { lat: latLng.lat(), lng: latLng.lng() };
 
         calculateRoute(coordinate);
     };
-
     async function calculateRoute(coordinate) {
-        if (!coordinate && destinationRef?.current.value === '') {
+        if (!coordinate && !inputAddress) {
             return;
         }
 
@@ -55,25 +56,28 @@ const DeliveryMap = () => {
             const directionsService = new google.maps.DirectionsService();
             const results = await directionsService.route({
                 origin: shopPosition,
-                destination: coordinate || destinationRef.current.value,
+                destination: coordinate || inputAddress,
                 // eslint-disable-next-line no-undef
                 travelMode: google.maps.TravelMode.DRIVING
             });
-
+            setIsAddress(true);
             setError(false);
             setDirectionsResponse(results);
             setDestinationAddress(results.routes[0].summary);
             setDistance(results.routes[0].legs[0].distance.text);
             setDuration(results.routes[0].legs[0].duration.text);
         } catch (error) {
-            setAddress('');
-            setValue(false);
+            setDirectionsResponse(null);
+            setDestinationAddress(null);
+            setDistance(null);
+            setDuration(null);
+            setIsAddress(false);
             setError('Address not found');
         }
     }
 
     return (
-        <Box height={'300px'} width={'100%'} mb={'165px'}>
+        <Box height={'300px'} width={'100%'}>
             <GoogleMap
                 onClick={handleMapClick}
                 center={shopPosition}
@@ -97,7 +101,7 @@ const DeliveryMap = () => {
                 )}
             </GoogleMap>
 
-            <Box
+            {/* <Box
                 sx={{
                     mt: '15px'
                 }}
@@ -142,7 +146,7 @@ const DeliveryMap = () => {
                             label='address'
                             inputRef={destinationRef}
                             variant='outlined'
-                            form='delivery-form'
+                            form='delivery-form-post-user'
                             value={address}
                             placeholder='Write your address or use the map'
                             inputProps={{
@@ -175,7 +179,35 @@ const DeliveryMap = () => {
                 >
                     <Typography variant='subtitle1'>Pave the way</Typography>
                 </Button>
+            </Box> */}
+            <Box
+                display={'flex'}
+                justifyContent={'space-around'}
+                mb={'10px'}
+                gap={2}
+            >
+                <Typography variant='subtitle2' component={'span'}>
+                    Address: {destinationAddress}
+                </Typography>
+                <Typography variant='subtitle2' component={'span'}>
+                    Duration: {duration}
+                </Typography>
+                <Typography variant='subtitle2' component={'span'}>
+                    Distance: {distance}
+                </Typography>
             </Box>
+            <Button
+                onClick={() => inputAddress && calculateRoute()}
+                variant='outlined'
+                sx={{ maxWidth: '150px', display: 'block', m: '15px auto 0' }}
+            >
+                <Typography variant='subtitle1'>Pave the way</Typography>
+            </Button>
+            {error && (
+                <Typography textAlign={'center'} color={'red'}>
+                    {error}
+                </Typography>
+            )}
         </Box>
     );
 };

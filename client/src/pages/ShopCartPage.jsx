@@ -1,38 +1,46 @@
-import { Button, Container, Grid, Typography, Box } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Button, Container, Grid, Typography } from '@mui/material';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { sumBy } from '../utils/sumBy';
 import DeliveryForm from '../components/DeliveryForm/DeliveryForm';
 import GoodsList from '../components/GoodsList/GoodsList';
 import CartGoodItem from '../components/CartGoodItem/CartGoodItem';
-import { useSelector } from 'react-redux';
-import { sumBy } from '../utils/sumBy';
 import ModalSuccess from '../components/Modals/ModalSuccess';
-import DeliveryMap from '../components/DeliveryMap/DeliveryMap';
-import { FormProvider } from 'react-hook-form';
+
 const ShopCartPage = () => {
     const { cart } = useSelector(state => state.cartReducer);
 
     const [openModal, setOpenModal] = useState(false);
     const [isValid, setIsValid] = useState(false);
+    const [verifiedRecaptcha, setVerifiedRecaptcha] = useState(false);
+    const [total, setTotal] = useState(0);
+    const [orderId, setOrderId] = useState('');
 
     useEffect(() => {
-        if (!cart.length) {
-            setIsValid(false);
+        if (cart.length && verifiedRecaptcha) {
+            setIsValid(true);
         }
+    }, [cart, verifiedRecaptcha]);
+
+    useEffect(() => {
+        setTotal(sumBy(cart.map(({ quantity, price }) => quantity * price)));
     }, [cart]);
 
-    const getValid = valid => {
-        if (cart.length) {
-            setIsValid(valid);
-        }
+    const showModal = id => {
+        setOrderId(id);
+        setOpenModal(true);
+    };
+
+    const handlerRecaptcha = () => {
+        setVerifiedRecaptcha(true);
     };
 
     return (
         <Container sx={{ p: '30px 0' }}>
             <Grid container spacing={2} marginBottom={'20px'}>
                 <Grid item xs={6}>
-                    {/* <DeliveryMap /> */}
-
-                    <DeliveryForm getValid={getValid} />
+                    <DeliveryForm showModal={showModal} total={total} />
                 </Grid>
                 <Grid item xs={6}>
                     <GoodsList height={'750px'}>
@@ -56,14 +64,14 @@ const ShopCartPage = () => {
                     </GoodsList>
                 </Grid>
             </Grid>
+            <ReCAPTCHA
+                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                onChange={handlerRecaptcha}
+            />
             <Grid container justifyContent={'flex-end'} spacing={10}>
                 <Grid item>
                     <Typography variant='subtitle2' fontSize={'1.5rem'}>
-                        Total price:{' '}
-                        {sumBy(
-                            cart.map(({ quantity, price }) => quantity * price)
-                        )}
-                        $
+                        Total price: {total}$
                     </Typography>
                 </Grid>
                 <Grid item>
@@ -71,8 +79,7 @@ const ShopCartPage = () => {
                         variant='outlined'
                         color='error'
                         type='submit'
-                        form='delivery-form'
-                        onClick={() => (isValid ? setOpenModal(true) : null)}
+                        form='delivery-form-post-user'
                         disabled={!isValid}
                         sx={{ color: 'white' }}
                     >
@@ -80,7 +87,7 @@ const ShopCartPage = () => {
                     </Button>
                 </Grid>
             </Grid>
-            {openModal && <ModalSuccess openModal={true} />}
+            {openModal && <ModalSuccess openModal={true} id={orderId} />}
         </Container>
     );
 };

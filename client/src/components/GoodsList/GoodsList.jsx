@@ -1,4 +1,4 @@
-import { Box, Grid, List, ListItem } from '@mui/material';
+import { Box, Grid, List } from '@mui/material';
 import React from 'react';
 
 const GoodsList = ({ children, height = '80vh' }) => {

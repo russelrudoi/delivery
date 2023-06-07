@@ -4,15 +4,26 @@ import { User } from '../models/user.js';
 class UserController {
     async create(req, res) {
         try {
-            const { orderDate, name, phone, email, address, meals } =
-                await req.body;
-
-            const user = new User({
+            const {
                 orderDate,
                 name,
                 phone,
                 email,
                 address,
+                meals,
+                total,
+                orderId
+            } = await req.body;
+
+            const user = new User({
+                _id: new ObjectId(),
+                orderDate,
+                orderId,
+                name,
+                phone,
+                email,
+                address,
+                total,
                 meals
             });
 
@@ -23,22 +34,17 @@ class UserController {
     }
 
     async getOne(req, res) {
-        const user = await User.find({ name: 'Igor' });
-        console.log(user[0]);
-        const { name, phone, image } = user[0];
-        let nameImg = image.match(/\/([^\/?#]+)[^\/]*$/);
-        // let nameImg = 23;
+        try {
+            const user = await User.find(req.query);
 
-        const userData = {
-            name,
-            phone,
-            image: `http://localhost:5000/image/${nameImg[1]}`
-        };
-        return res.status(200).json({
-            code: 200,
-            message: 'info',
-            data: userData
-        });
+            if (!user.length) {
+                return res.status(500).send('User is not found');
+            }
+            console.log(user);
+            return res.json(user);
+        } catch (error) {
+            return res.status(500).send('Failed to get user');
+        }
     }
 }
 

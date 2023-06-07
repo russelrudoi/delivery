@@ -17,7 +17,7 @@ export const shopSlice = createSlice({
         });
         builder.addCase(fetchShops.rejected, (state, { payload }) => {
             state.loading = false;
-            state.error = payload.data;
+            state.error = payload;
         });
     }
 });

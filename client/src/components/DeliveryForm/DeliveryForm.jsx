@@ -1,57 +1,60 @@
-import { Box, Button, TextField, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearCart } from '../../store/cart/cartSlice';
+import { Box, TextField } from '@mui/material';
+import * as uuid from 'uuid';
+import { useJsApiLoader, Autocomplete } from '@react-google-maps/api';
 import api from '../../api/axios';
+import { clearCart } from '../../store/cart/cartSlice';
 import { convertDate } from '../../utils/convertDate';
 import DeliveryMap from '../DeliveryMap/DeliveryMap';
+import NameAndEmailForm from './NameAndEmailForm';
+import PhoneForm from './PhoneForm';
 
-const DeliveryForm = ({ getValid }) => {
+const libraries = ['places'];
+
+const DeliveryForm = ({ showModal, total }) => {
     const dispatch = useDispatch();
     const { cart } = useSelector(state => state.cartReducer);
-    const [isAddress, setIsAddress] = useState(false);
 
-    const fieldsName = [
-        {
-            name: 'name',
-            validation: { maxLength: 20, message: 'Too long name' }
-        },
-        {
-            name: 'email',
-            validation: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Invalid email address'
-            }
-        },
-        { name: 'phone', validation: {} }
-    ];
-
-    const methods = useForm();
+    const [destination, setDestination] = useState('');
+    const [isFocus, setIsFocus] = useState(false);
+    const [allValid, setAllValid] = useState(false);
+    const [inputAddress, setInputAddress] = useState('');
 
     const {
         register,
         handleSubmit,
         reset,
+        control,
         formState: { errors, isValid }
-    } = methods;
+    } = useForm();
+
+    const watchedInputAddress = useWatch({ control, name: 'address' });
 
     useEffect(() => {
-        console.log(isValid);
-        getValid(isValid);
-    }, [isValid, getValid]);
+        if (!isFocus) setDestination(watchedInputAddress);
+    }, [watchedInputAddress, isFocus]);
+
+    const { isLoaded } = useJsApiLoader({
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+        libraries: libraries
+    });
 
     const submitData = handleSubmit(data => {
-        console.log(isValid);
-        if (!isValid) return;
+        if (!isValid || !allValid) return;
+        const id = uuid.v4();
 
         const body = {
             ...data,
+            total,
+            orderId: id,
             orderDate: convertDate(new Date()),
+            address: destination || inputAddress,
             meals: [...cart]
         };
-        console.log(body);
         api.post('/user', body)
+            .then(showModal(id))
             .then(dispatch(clearCart()))
             .then(reset())
             .catch(error => {
@@ -59,54 +62,91 @@ const DeliveryForm = ({ getValid }) => {
             });
     });
 
+    const getInputAddress = address => {
+        setIsFocus(false);
+        setInputAddress(address);
+    };
+
+    const validateFields = (valid, address) => {
+        setAllValid(valid);
+        setDestination(address);
+    };
+
     return (
         <Box
-            // height={'400px'}
             pb='30px'
             sx={{
                 bgcolor: 'background.paper',
                 borderRadius: '10px'
             }}
         >
-            {/* register={register} errors={errors} reset={reset} */}
-            <FormProvider {...methods}>
-                <DeliveryMap />
-            </FormProvider>
-            <form onSubmit={submitData} id='delivery-form'>
-                {fieldsName.map(nameField => (
-                    <Box
-                        display='flex'
-                        flexDirection='column'
-                        alignItems='center'
-                        pt={'30px'}
-                        key={nameField.name}
-                    >
-                        <TextField
-                            sx={{
-                                width: '80%',
-                                m: '0 auto',
-                                '.css-x6vx7i-MuiInputBase-root-MuiOutlinedInput-root':
-                                    { color: 'white' },
-                                '.css-1d3z3hw-MuiOutlinedInput-notchedOutline':
-                                    { borderColor: 'white' }
+            <DeliveryMap
+                inputAddress={inputAddress}
+                validateFields={validateFields}
+                isFocus={isFocus}
+            />
+            <form onSubmit={submitData} id='delivery-form-post-user'>
+                <Box
+                    sx={{
+                        mt: '110px'
+                    }}
+                >
+                    {isLoaded && (
+                        <Autocomplete
+                            onLoad={autocomplete => {
+                                autocomplete.addListener('place_changed', () =>
+                                    getInputAddress(
+                                        autocomplete.getPlace()
+                                            .formatted_address
+                                    )
+                                );
                             }}
-                            color='primary'
-                            label={nameField.name}
-                            variant='outlined'
-                            {...register(nameField.name, {
-                                required: 'Field is required',
-                                pattern: nameField.validation
-                            })}
-                        />
-                        <Typography component={'div'}>
-                            {errors[nameField.name] && (
-                                <Typography color={'red'}>
-                                    {errors[nameField.name].message || 'Error'}
-                                </Typography>
-                            )}
-                        </Typography>
-                    </Box>
-                ))}
+                        >
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <TextField
+                                    sx={{
+                                        width: '80%',
+                                        '.css-x6vx7i-MuiInputBase-root-MuiOutlinedInput-root':
+                                            {
+                                                color: 'white'
+                                            },
+                                        '.css-1d3z3hw-MuiOutlinedInput-notchedOutline':
+                                            {
+                                                borderColor: 'white'
+                                            }
+                                    }}
+                                    color='primary'
+                                    id='outlined-basic'
+                                    label='address'
+                                    variant='outlined'
+                                    form='delivery-form-post-user'
+                                    placeholder='Write your address or use the map'
+                                    inputProps={{
+                                        onFocus: () => setIsFocus(true),
+                                        onBlur: e => {
+                                            getInputAddress(e.target.value);
+                                        }
+                                    }}
+                                    {...register('address')}
+                                />
+                            </Box>
+                        </Autocomplete>
+                    )}
+
+                    <NameAndEmailForm register={register} errors={errors} />
+                </Box>
+                <Box>
+                    <PhoneForm
+                        control={control}
+                        errors={errors}
+                        register={register}
+                    />
+                </Box>
             </form>
         </Box>
     );

@@ -6,9 +6,8 @@ import {
     ListSubheader,
     Typography
 } from '@mui/material';
-import React from 'react';
 
-const ShopsList = ({ shops, getIdShop }) => {
+const ShopsList = ({ shops, getIdShop, shopsList }) => {
     return (
         <Box pr={'10px'}>
             <List
@@ -45,7 +44,8 @@ const ShopsList = ({ shops, getIdShop }) => {
                             sx={{
                                 width: '75%',
                                 height: '50px',
-                                color: 'white'
+                                color:
+                                    item.meals === shopsList ? 'red' : 'white'
                             }}
                         >
                             <Typography variant='subtitle1'>

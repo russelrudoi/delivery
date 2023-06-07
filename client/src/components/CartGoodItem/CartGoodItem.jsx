@@ -1,33 +1,19 @@
-import React from 'react';
+import { useDispatch } from 'react-redux';
 import {
     Box,
     Card,
     CardContent,
     CardMedia,
-    InputLabel,
-    TextField,
     Typography,
     Grid,
-    Icon,
     IconButton
 } from '@mui/material';
 import { Add, Remove, HighlightOff } from '@mui/icons-material';
-
-import GoodsImg from '../../assets/img/burger.jpg';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { addGoodToCart, deleteGoodFromCart } from '../../store/cart/cartSlice';
 
 const CartGoodItem = ({ cartGood, widthItem }) => {
     const dispatch = useDispatch();
     const { image, name, price, quantity } = cartGood;
-
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors, isValid }
-    } = useForm();
 
     const changeQuantity = (item, quantity) => {
         dispatch(addGoodToCart({ ...item, quantity }));

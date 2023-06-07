@@ -1,12 +1,15 @@
 import { ObjectId } from 'mongodb';
-import mongoose, { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const userSchema = new Schema({
+    _id: ObjectId,
+    orderId: String,
     orderDate: String,
     name: String,
     phone: String,
     email: String,
     address: String,
+    total: String,
     meals: [
         {
             name: String,

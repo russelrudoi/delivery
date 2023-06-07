@@ -1,7 +1,8 @@
-import { Box, Typography, Button, Modal } from '@mui/material';
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Button, Modal } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
+
 const style = {
     position: 'absolute',
     top: '50%',
@@ -14,7 +15,7 @@ const style = {
     p: 4
 };
 
-const ModalSuccess = ({ openModal = false }) => {
+const ModalSuccess = ({ openModal = false, id }) => {
     const [open, setOpen] = useState(openModal);
     const navigate = useNavigate();
 
@@ -30,8 +31,7 @@ const ModalSuccess = ({ openModal = false }) => {
             <Modal
                 open={open}
                 onClose={handleClose}
-                aria-labelledby='modal-modal-title'
-                aria-describedby='modal-modal-description'
+                sx={{ backdropFilter: 'blur(5px)' }}
             >
                 <Box sx={style}>
                     <Typography
@@ -42,6 +42,8 @@ const ModalSuccess = ({ openModal = false }) => {
                         <CheckIcon color='success' sx={{ marginRight: 2 }} />
                         Your order is accepted
                     </Typography>
+                    <Typography variant='subtitle2'>Your order id:</Typography>
+                    <Typography variant='subtitle1'>{id}</Typography>
                 </Box>
             </Modal>
         </>
