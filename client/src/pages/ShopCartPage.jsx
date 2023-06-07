@@ -36,6 +36,10 @@ const ShopCartPage = () => {
         setVerifiedRecaptcha(true);
     };
 
+    // window.grecaptcha.catch(err => {
+    //     console.error(err);
+    // });
+
     return (
         <Container sx={{ p: '30px 0' }}>
             <Grid container spacing={2} marginBottom={'20px'}>

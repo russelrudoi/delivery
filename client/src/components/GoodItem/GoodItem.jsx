@@ -25,7 +25,7 @@ const GoodItem = ({ meal, widthItem, button = true }) => {
                 <CardMedia
                     component='img'
                     alt={name}
-                    image={`http://localhost:5000/image/${image}`}
+                    image={image}
                     sx={{ height: '170px' }}
                 />
                 <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>

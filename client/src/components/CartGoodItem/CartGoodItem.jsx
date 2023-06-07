@@ -29,7 +29,7 @@ const CartGoodItem = ({ cartGood, widthItem }) => {
                 <CardMedia
                     component='img'
                     alt={name}
-                    image={`http://localhost:5000/image/${image}`}
+                    image={image}
                     sx={{ width: '250px' }}
                 />
                 <Box flexGrow={5}>

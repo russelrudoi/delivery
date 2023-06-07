@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import 'dotenv/config';
 import cors from 'cors';
 import router from './routes/index.js';
-import path from 'path';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
